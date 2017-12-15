@@ -9,6 +9,7 @@ import android.widget.RemoteViews;
 import java.io.IOException;
 import java.util.List;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,20 +49,17 @@ public class SampleWidget extends AppWidgetProvider {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         GitHubService service = retrofit.create(GitHubService.class);
-        Call<List<Repo>> repos = service.listRepos("chiiia12");
+        Observable<List<Repo>> repos = service.listRepos("chiiia12");
 
         // asynchronous call
-        repos.enqueue(new Callback<List<Repo>>() {
-            @Override
-            public void onResponse(Call<List<Repo>> call, Response<List<Repo>> response) {
-                Log.d(TAG, "onResponse: " + response.body().toString());
-            }
+        repos.subscribe(
+                list -> Log.d(TAG, "onUpdate: " + list.toString()),
+                throwable -> Log.d(TAG, "throwable"),
+                () -> Log.d(TAG, "complete ")
+        );
+    }
 
-            @Override
-            public void onFailure(Call<List<Repo>> call, Throwable t) {
-
-            }
-        });
+    private void hoge() {
     }
 
     @Override
